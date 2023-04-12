@@ -1,87 +1,87 @@
-       IDENTIFICATION DIVISION.
-       PROGRAM-ID. AOC-2016-D2P1.
-
-       ENVIRONMENT DIVISION.
-       INPUT-OUTPUT SECTION.
-       FILE-CONTROL.
-           SELECT INPUTFILE ASSIGN TO 'INPUT'
-           ORGANIZATION IS LINE SEQUENTIAL.
-
-       DATA DIVISION.
-       FILE SECTION.
-       FD INPUTFILE IS EXTERNAL
-           RECORD IS VARYING IN SIZE
-           DATA RECORD IS INPUT-LINE.
-       01 INPUT-LINE  PIC X(999).
-
-       WORKING-STORAGE SECTION.
-       01 INDX        PIC 999    VALUE 001.
-       01 OFFSET      PIC 999.
-       01 LEN         PIC 999.
-       01 LOOP        PIC 9      VALUE 1.
-       01 X           PIC 9      VALUE 2.
-       01 Y           PIC 9      VALUE 2.
-       01 KEYPAD.
-          05 ROW OCCURS 3 TIMES.
-             10 CLM   PIC X OCCURS 3 TIMES.
-
-       PROCEDURE DIVISION.
-       MAIN.
-           MOVE '123' TO ROW(1)
-           MOVE '456' TO ROW(2)
-           MOVE '789' TO ROW(3)
-
-           OPEN INPUT INPUTFILE.
-           PERFORM UNTIL LOOP = 0
-                   READ INPUTFILE NEXT RECORD INTO INPUT-LINE
-                   AT END
-                      MOVE 0 TO LOOP
-                      DISPLAY ' '
-                   NOT AT END
-                       PERFORM
-                          PARSE-INPUT
-                       DISPLAY CLM(Y, X) WITH NO ADVANCING 
-                   END-READ
-           END-PERFORM.
-           CLOSE INPUTFILE.
-
-           GOBACK.
-
-       PARSE-INPUT.
-           MOVE 0 TO LEN
-           MOVE 1 TO OFFSET
-
-           INSPECT INPUT-LINE TALLYING LEN FOR CHARACTERS BEFORE SPACE.
-           PERFORM LEN TIMES
-              
-                   EVALUATE INPUT-LINE(OFFSET:1)
-                   WHEN 'U'
-                        SUBTRACT 1 FROM Y
-                   WHEN 'D'
-                        ADD 1 TO Y
-                   WHEN 'L'
-                        SUBTRACT 1 FROM X
-                   WHEN 'R'
-                        ADD 1 TO X
-                   END-EVALUATE
-
-                   ADD 1 TO OFFSET
-
-                   IF Y < 1 THEN
-                      MOVE 1 TO Y
-                   ELSE
-                      IF Y > 3 THEN
-                         MOVE 3 TO Y
-                      END-IF
-                   END-IF
-
-                   IF X < 1 THEN
-                      MOVE 1 TO X
-                   ELSE
-                      IF X > 3 THEN
-                         MOVE 3 TO X
-                      END-IF
-                   END-IF
-           END-PERFORM.
-           
-       END PROGRAM AOC-2016-D2P1.
+000100 IDENTIFICATION DIVISION.
+000200 PROGRAM-ID. AOC-2016-D2P1.
+000300
+000400 ENVIRONMENT DIVISION.
+000500 INPUT-OUTPUT SECTION.
+000600 FILE-CONTROL.
+000700     SELECT INPUTFILE ASSIGN TO 'INPUT'
+000800     ORGANIZATION IS LINE SEQUENTIAL.
+000900
+001000 DATA DIVISION.
+001100 FILE SECTION.
+001200 FD INPUTFILE IS EXTERNAL
+001300     RECORD IS VARYING IN SIZE
+001400     DATA RECORD IS INPUT-LINE.
+001500 01 INPUT-LINE  PIC X(999).
+001600
+001700 WORKING-STORAGE SECTION.
+001800 01 INDX        PIC 999    VALUE 001.
+001900 01 OFFSET      PIC 999.
+002000 01 LEN         PIC 999.
+002100 01 LOOP        PIC 9      VALUE 1.
+002200 01 X           PIC 9      VALUE 2.
+002300 01 Y           PIC 9      VALUE 2.
+002400 01 KEYPAD.
+002500    05 ROW OCCURS 3 TIMES.
+002600       10 CLM   PIC X OCCURS 3 TIMES.
+002700
+002800 PROCEDURE DIVISION.
+002900 MAIN.
+003000     MOVE '123' TO ROW(1)
+003100     MOVE '456' TO ROW(2)
+003200     MOVE '789' TO ROW(3)
+003300
+003400     OPEN INPUT INPUTFILE.
+003500     PERFORM UNTIL LOOP = 0
+003600             READ INPUTFILE NEXT RECORD INTO INPUT-LINE
+003700             AT END
+003800                MOVE 0 TO LOOP
+003900                DISPLAY ' '
+004000             NOT AT END
+004100                 PERFORM
+004200                    PARSE-INPUT
+004300                 DISPLAY CLM(Y, X) WITH NO ADVANCING 
+004400             END-READ
+004500     END-PERFORM.
+004600     CLOSE INPUTFILE.
+004700
+004800     GOBACK.
+004900
+005000 PARSE-INPUT.
+005100     MOVE 0 TO LEN
+005200     MOVE 1 TO OFFSET
+005300
+005400     INSPECT INPUT-LINE TALLYING LEN FOR CHARACTERS BEFORE SPACE.
+005500     PERFORM LEN TIMES
+005600        
+005700             EVALUATE INPUT-LINE(OFFSET:1)
+005800             WHEN 'U'
+005900                  SUBTRACT 1 FROM Y
+006000             WHEN 'D'
+006100                  ADD 1 TO Y
+006200             WHEN 'L'
+006300                  SUBTRACT 1 FROM X
+006400             WHEN 'R'
+006500                  ADD 1 TO X
+006600             END-EVALUATE
+006700
+006800             ADD 1 TO OFFSET
+006900
+007000             IF Y < 1 THEN
+007100                MOVE 1 TO Y
+007200             ELSE
+007300                IF Y > 3 THEN
+007400                   MOVE 3 TO Y
+007500                END-IF
+007600             END-IF
+007700
+007800             IF X < 1 THEN
+007900                MOVE 1 TO X
+008000             ELSE
+008100                IF X > 3 THEN
+008200                   MOVE 3 TO X
+008300                END-IF
+008400             END-IF
+008500     END-PERFORM.
+008600     
+008700 END PROGRAM AOC-2016-D2P1.
