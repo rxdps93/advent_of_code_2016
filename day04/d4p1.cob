@@ -1,0 +1,98 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. AOC-2016-D4P1.
+
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT INPUTFILE ASSIGN TO 'INPUT'
+           ORGANIZATION IS LINE SEQUENTIAL.
+
+       DATA DIVISION.
+       FILE SECTION. 
+       FD INPUTFILE IS EXTERNAL 
+           RECORD IS VARYING IN SIZE
+           DATA RECORD IS INPUT-LINE.
+       01 INPUT-LINE  PIC X(999).
+
+       WORKING-STORAGE SECTION. 
+       01 LOOP        PIC 9        VALUE 1.
+       01 LOOP2       PIC 99       VALUE 1.
+       01 LEN         PIC 999.
+       01 LEN2        PIC 999.
+       01 TEMP        PIC X(999).
+       01 SECTOR-SUM  PIC 999999    VALUE 000000.
+       01 ROOM-NAME   PIC A(99).
+       01 SECTOR-ID   PIC 999.
+       01 CHECKSUM    PIC AAAAA.
+       01 FREQUENCIES.
+           05 FREQ-MAP OCCURS 26 TIMES.
+              10 LTRS PIC A.
+              10 FREQ PIC 99.
+       01 LETTERS     PIC A(26) VALUE 'abcdefghijklmnopqrstuvwxyz'. 
+
+       PROCEDURE DIVISION.
+       MAIN.
+           OPEN INPUT INPUTFILE.
+           PERFORM UNTIL LOOP = 0
+                   READ INPUTFILE NEXT RECORD INTO INPUT-LINE
+                   AT END
+                      MOVE 0 TO LOOP
+                   NOT AT END
+                       PERFORM PARSE-LINE
+                   END-READ
+           END-PERFORM
+           CLOSE INPUTFILE.
+           DISPLAY SECTOR-SUM.
+           GOBACK.
+
+       PARSE-LINE.
+           MOVE 0 TO LEN
+
+      *    FORMAT LINE
+           MOVE FUNCTION REVERSE(INPUT-LINE) TO TEMP
+           INSPECT TEMP REPLACING FIRST '-' BY ','
+           MOVE FUNCTION REVERSE(TEMP) TO INPUT-LINE
+
+           INSPECT INPUT-LINE REPLACING ALL '[' BY ','
+           INSPECT INPUT-LINE REPLACING ALL ']' BY SPACE
+
+      *    SPLIT INTO PRIMARY SECTIONS
+           UNSTRING INPUT-LINE DELIMITED BY ','
+              INTO TEMP SECTOR-ID CHECKSUM
+           END-UNSTRING
+           
+      *    ISOLATE ROOM ID
+           MOVE 0 TO LEN
+           INSPECT TEMP TALLYING LEN FOR CHARACTERS BEFORE SPACE
+
+           MOVE ' ' TO ROOM-NAME
+           PERFORM VARYING LEN2 FROM 1 BY 1 UNTIL LEN2 > LEN
+              IF TEMP(LEN2:1) IS NOT EQUAL TO '-' THEN
+                 STRING ROOM-NAME TEMP(LEN2:1) DELIMITED BY SPACE
+                    INTO ROOM-NAME
+                 END-STRING
+              END-IF
+           END-PERFORM
+      
+      *    MAP LETTERS TO FREQUENCY AND SORT
+           MOVE 0 TO LEN
+           INSPECT ROOM-NAME TALLYING LEN FOR CHARACTERS BEFORE SPACE
+           PERFORM VARYING LOOP2 FROM 1 BY 1 UNTIL LOOP2 > 26
+              MOVE 0 TO LEN2
+              INSPECT ROOM-NAME(1:LEN) TALLYING LEN2
+                 FOR ALL LETTERS(LOOP2:1)
+              MOVE LEN2 TO FREQ(LOOP2)
+              MOVE LETTERS(LOOP2:1) TO LTRS(LOOP2)
+           END-PERFORM
+
+           SORT FREQ-MAP DESCENDING FREQ.
+
+           IF LTRS(1) = CHECKSUM(1:1) AND
+              LTRS(2) = CHECKSUM(2:1) AND
+              LTRS(3) = CHECKSUM(3:1) AND
+              LTRS(4) = CHECKSUM(4:1) AND
+              LTRS(5) = CHECKSUM(5:1) THEN
+              ADD SECTOR-ID TO SECTOR-SUM
+           END-IF.
+
+       END PROGRAM AOC-2016-D4P1.
