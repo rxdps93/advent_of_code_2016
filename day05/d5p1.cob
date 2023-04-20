@@ -41,10 +41,10 @@
        01  LEN PIC 99 VALUE 00.
        01  EOF PIC X VALUE 'F'.
        
-       01  PRE   PIC X(8) VALUE 'echo -n'.
-       01  DOOR-ID PIC A(3) VALUE 'abc'.
+       01  PRE   PIC X(8) VALUE 'echo -n '.
+       01  DOOR-ID PIC A(8) VALUE 'uqwqemis'.
        01  INDX PIC 9(8) VALUE 0.
-       01  POST PIC X(16) VALUE ' | md5sum > TEMP'.
+       01  POST PIC X(9) VALUE ' | md5sum'.
        01  HASH PIC X(32).
        01  PSWD PIC X(8).
        01  CURR PIC 9 VALUE 1.
