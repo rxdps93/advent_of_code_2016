@@ -33,11 +33,11 @@
        
        01  PRE   PIC X(8) VALUE 'echo -n '.
        01  DOOR-ID PIC A(8) VALUE 'uqwqemis'.
-       01  INDX PIC 9(8) VALUE 0.
+       01  INDX PIC 9(8) VALUE 4515050.
        01  POST PIC X(9) VALUE ' | md5sum'.
        01  HASH PIC X(32).
        01  PSWD PIC X(8) VALUE '________'.
-       01  POS  PIC 9.
+       01  PSN  PIC 9 VALUE 0.
        01  CURR PIC 9 VALUE 1.
 
        PROCEDURE DIVISION.
@@ -50,19 +50,27 @@
        GET-PASSWORD.
            PERFORM UNTIL CURR > 8
               PERFORM MD5
-              IF FUNCTION MOD(INDX, 1000) = 0 THEN
+              IF FUNCTION MOD(INDX, 10000) = 0 THEN
                  DISPLAY INDX
               END-IF 
               IF HASH(1:5) IS EQUAL TO 00000 THEN
                  DISPLAY INDX
-                 DISPLAY '    'CURR': 'HASH(6:1)
-                 IF HASH(6:1) IS NUMERIC AND
-                    HASH(6:1) IS LESS THAN OR EQUAL TO 7 AND
-                    PSWD(HASH(6:1):1) IS NOT EQUAL TO '_' THEN
-                    MOVE HASH(6:1) TO POS
-                    SUBTRACT ONE FROM POS
-                    MOVE HASH(7:1) TO PSWD(POS:1)
-                    ADD 1 TO CURR
+                 DISPLAY '    'HASH
+                 
+                 IF HASH(6:1) IS NUMERIC THEN
+                    MOVE HASH(6:1) TO PSN
+                    ADD 1 TO PSN
+                    IF PSN IS LESS THAN OR EQUAL TO 8 AND
+                       PSWD(PSN:1) IS EQUAL TO '_' THEN
+                       
+                       MOVE HASH(7:1) TO PSWD(PSN:1)
+                       ADD 1 TO CURR
+                       DISPLAY '    'PSWD
+                    ELSE
+                       DISPLAY '    MISS: INVALID OR DUPLICATE POSITION'
+                    END-IF
+                 ELSE
+                    DISPLAY '    MISS: NON NUMERIC VALUE'
                  END-IF
               END-IF
               ADD 1 TO INDX
