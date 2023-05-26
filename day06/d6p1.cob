@@ -16,8 +16,12 @@
 
        WORKING-STORAGE SECTION. 
        01  LOOP     PIC 9       VALUE 1.
-       01  FREQ     PIC 99    VALUE 0.
+       01  LTR      PIC 99      VALUE 00.
        01  OFFSET   PIC 9(9).
+       01  FREQS    PIC 999     OCCURS 26 TIMES   VALUE 000.
+       01  MESG     PIC A(8).
+       01  LEN      PIC 9.
+       01  PSN      PIC 9       VALUE 1.
 
        PROCEDURE DIVISION.
        MAIN.
@@ -29,18 +33,25 @@
               AT END
                  MOVE 0 TO LOOP
               NOT AT END
-                 DISPLAY INPUT-LINE
-                 SUBTRACT
-                    OFFSET FROM
-                    FUNCTION ORD(INPUT-LINE(1:1))
-                    GIVING FREQ
-                 DISPLAY '    'FREQ
-                 ADD 1 TO FREQ
-                 DISPLAY '    'FUNCTION CHAR(FREQ)
+                 PERFORM GET-FREQ
               END-READ
            END-PERFORM
            CLOSE INPUTFILE.
-
+           PERFORM GET-MESG.
            GOBACK.
+
+       GET-FREQ.
+           MOVE 0 TO LEN
+           INSPECT INPUT-LINE TALLYING LEN FOR CHARACTERS BEFORE SPACE
+           PERFORM VARYING PSN FROM 1 BY 1 UNTIL PSN > LEN
+              SUBTRACT OFFSET FROM FUNCTION ORD(INPUT-LINE(PSN:1))
+                 GIVING LTR
+              ADD 1 TO FREQS(LTR)
+           END-PERFORM.
+
+       GET-MESG.
+           PERFORM VARYING LTR FROM 1 BY 1 UNTIL LTR > 26
+              
+           END-PERFORM.
 
        END PROGRAM AOC-2016-D6P1.
