@@ -29,6 +29,7 @@
               10 R-VAL    PIC 999     VALUE 0.
               10 LO       PIC 999     VALUE 0.
               10 HI       PIC 999     VALUE 0.
+              10 PROC     PIC 9       VALUE 0.
 
        PROCEDURE DIVISION.
        MAIN.
@@ -43,7 +44,6 @@
            END-PERFORM
            CLOSE INPUTFILE
 
-           DISPLAY 'BEGIN'
            MOVE 1 TO LOOP
            PERFORM UNTIL LOOP = 0
               MOVE 0 TO LOOP
@@ -51,7 +51,9 @@
                  IF BOT IN CHIPS(TMP) IS NOT EQUAL TO 999 THEN
 
                     IF L-VAL IN CHIPS(TMP) IS NOT EQUAL TO 0 AND 
-                       R-VAL IN CHIPS(TMP) IS NOT EQUAL TO 0 THEN
+                       R-VAL IN CHIPS(TMP) IS NOT EQUAL TO 0 AND
+                       PROC IN CHIPS(TMP) IS EQUAL TO 0 THEN
+
                        PERFORM ASSIGN-CHIPS
                     END-IF
 
@@ -65,21 +67,11 @@
            END-PERFORM
 
            PERFORM VARYING TMP FROM 1 BY 1 UNTIL TMP > 250
-      *       MOVE L-VAL IN CHIPS(TMP) TO TMP-L
-      *       MOVE R-VAL IN CHIPS(TMP) TO TMP-R
-      *       IF TMP-L = 61 AND TMP-R = 17 THEN
-
-      *          DISPLAY 'BOT 'BOT IN CHIPS(TMP)
-      *       ELSE IF TMP-L = 17 AND TMP-R = 61 THEN
-      *          DISPLAY 'BOT 'BOT IN CHIPS(TMP)
-      *       END-IF
-              IF BOT IN CHIPS(TMP) IS NOT EQUAL TO 999 THEN
-                 
-                 DISPLAY BOT IN CHIPS(TMP)', ['
-                          L-VAL IN CHIPS(TMP)', '
-                          R-VAL IN CHIPS(TMP)']'
-      *          DISPLAY '    'LO IN CHIPS(TMP) ' & '
-      *                HI IN CHIPS(TMP)
+              MOVE L-VAL IN CHIPS(TMP) TO TMP-L
+              MOVE R-VAL IN CHIPS(TMP) TO TMP-R
+              IF TMP-L = 17 AND TMP-R = 61 THEN
+                 DISPLAY 'BOT 'BOT IN CHIPS(TMP)
+                 EXIT PERFORM
               END-IF
            END-PERFORM
 
@@ -90,8 +82,8 @@
               IF BOT IN CHIPS(TMP) IS NOT EQUAL TO 999 THEN
                  MOVE L-VAL IN CHIPS(TMP) TO TMP-L
                  MOVE R-VAL IN CHIPS(TMP) TO TMP-R
-                 MOVE FUNCTION MIN(TMP-L TMP-R) TO L-VAL
-                 MOVE FUNCTION MAX(TMP-L TMP-R) TO R-VAL
+                 MOVE FUNCTION MIN(TMP-L TMP-R) TO L-VAL IN CHIPS(TMP)
+                 MOVE FUNCTION MAX(TMP-L TMP-R) TO R-VAL IN CHIPS(TMP)
               END-IF
            END-PERFORM.
 
@@ -102,17 +94,16 @@
            MOVE LO IN CHIPS(TMP) TO TMP-R
            
            COMPUTE TMP2 = TMP - 1 END-COMPUTE
-           DISPLAY TMP2' -> 'L-VAL IN CHIPS(TMP)', 'R-VAL IN CHIPS(TMP)
-           IF TMP-R IS NOT EQUAL TO 999 AND TMP-L IS NOT EQUAL TO 0 THEN
+           IF TMP-R IS NOT EQUAL TO 999 THEN
               IF L-VAL IN CHIPS(TMP-R + 1) = 0 THEN
-                 DISPLAY 'LL    ASSIGNING 'TMP-L' FROM 'TMP2' TO 'TMP-R
                  MOVE TMP-L TO L-VAL IN CHIPS(TMP-R + 1)
+                 ADD 1 TO PROC IN CHIPS(TMP)
               ELSE IF R-VAL IN CHIPS(TMP-R + 1) = 0 THEN
-                 DISPLAY 'LR    ASSIGNING 'TMP-L' FROM 'TMP2' TO 'TMP-R
                  MOVE TMP-L TO R-VAL IN CHIPS(TMP-R + 1)
-              ELSE
-                 DISPLAY 'L     OVERWRITE DETECTED!'
+                 ADD 1 TO PROC IN CHIPS(TMP)
               END-IF
+           ELSE
+              ADD 1 TO PROC IN CHIPS(TMP)
            END-IF
 
       *    HIGH
@@ -120,16 +111,16 @@
               TO TMP-L
            MOVE HI IN CHIPS(TMP) TO TMP-R
 
-           IF TMP-R IS NOT EQUAL TO 999 AND TMP-L IS NOT EQUAL TO 0 THEN
+           IF TMP-R IS NOT EQUAL TO 999 THEN
               IF L-VAL IN CHIPS(TMP-R + 1) = 0 THEN
-                 DISPLAY 'HL    ASSIGNING 'TMP-L' FROM 'TMP2' TO 'TMP-R
                  MOVE TMP-L TO L-VAL IN CHIPS(TMP-R + 1)
+                 ADD 1 TO PROC IN CHIPS(TMP)
               ELSE IF R-VAL IN CHIPS(TMP-R + 1) = 0 THEN
-                 DISPLAY 'HR    ASSIGNING 'TMP-L' FROM 'TMP2' TO 'TMP-R
                  MOVE TMP-L TO R-VAL IN CHIPS(TMP-R + 1)
-              ELSE 
-                 DISPLAY 'H     OVERWRITE DETECTED!'
+                 ADD 1 TO PROC IN CHIPS(TMP)
               END-IF
+           ELSE
+              ADD 1 TO PROC IN CHIPS(TMP)
            END-IF.
 
        PARSE-LINE.
